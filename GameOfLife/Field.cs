@@ -1,76 +1,92 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace GameOfLife
+﻿namespace GameOfLife
 {
     public class Field
     {
-        public int LenghtOfField { get; }
+        public int LengthOfField { get; }
         public int HeightOfField { get; }
-        public string[,] Cells { get; set; }
+        public string[,] Cells { get; }
 
-        public Field(int lenghtOfField, int heightOfField)
+        private readonly string[,] _cellsOldGeneration;
+
+        public Field(int lengthOfField, int heightOfField)
         {
-            LenghtOfField = lenghtOfField;
+            LengthOfField = lengthOfField;
             HeightOfField = heightOfField;
-            Cells = new string[LenghtOfField, HeightOfField];
+            Cells = new string[LengthOfField, HeightOfField];
 
-            for (int i = 0; i < LenghtOfField; i++)
+            for (int i = 0; i < LengthOfField; i++)
             {
                 for (int j = 0; j < HeightOfField; j++)
                 {
-                    Cells[i, j] = ".";
+                    Cells[i, j] = " ";
                 }
             }
+
+            _cellsOldGeneration = new string[LengthOfField, HeightOfField];
+            Array.Copy(Cells, _cellsOldGeneration, LengthOfField * HeightOfField);
         }
 
-        public void SwitchLiveState(int indexLenght, int indexHeight)
-        {
-            if (CellIsDead(indexLenght, indexHeight))
-            {
-                Cells[indexLenght, indexHeight] = "*";
-            }
-            else if (CellIsAlive(indexLenght, indexHeight))
-            {
-                Cells[indexLenght, indexHeight] = ".";
-            }
-        }
         public void GoToNextGeneration()
         {
-            for (int lenght = 0; lenght < LenghtOfField; lenght++)
+            Array.Copy(Cells, _cellsOldGeneration, LengthOfField * HeightOfField);
+
+            for (int length = 0; length < LengthOfField; length++)
             {
                 for (int height = 0; height < HeightOfField; height++)
                 {
-                    int aliveNeighbours = GetAliveNeighbours(lenght, height);
+                    int aliveNeighbours = GetAliveNeighbours(length, height);
 
-                    if (CellIsAlive(lenght, height) && (aliveNeighbours < 2 || aliveNeighbours > 3))
+                    if (CellIsAlive(length, height) && aliveNeighbours is < 2 or > 3)
                     {
-                        SwitchLiveState(lenght, height);
+                        SwitchLiveState(length, height);
                     }
-                    else if (CellIsDead(lenght, height) && aliveNeighbours == 3)
+                    else if (CellIsDead(length, height) && aliveNeighbours == 3)
                     {
-                        SwitchLiveState(lenght, height);
+                        SwitchLiveState(length, height);
                     }
                 }
             }
         }
 
-        private bool CellIsAlive(int indexLenght, int indexHeight)
+        public void SwitchLiveState(int indexLength, int indexHeight)
         {
-            return Cells[indexLenght, indexHeight] == "*";
+            if (CellIsDead(indexLength, indexHeight))
+            {
+                Cells[indexLength, indexHeight] = "*";
+            }
+            else if (CellIsAlive(indexLength, indexHeight))
+            {
+                Cells[indexLength, indexHeight] = " ";
+            }
         }
 
-        private bool CellIsDead(int indexLenght, int indexHeight)
+        private bool CellIsAlive(int indexLength, int indexHeight)
         {
-            return Cells[indexLenght, indexHeight] == ".";
+            return _cellsOldGeneration[indexLength, indexHeight] == "*";
         }
 
-        private int GetAliveNeighbours(int lenght, int height)
+        private bool CellIsDead(int indexLength, int indexHeight)
         {
-            throw new NotImplementedException(); //TODO
+            return _cellsOldGeneration[indexLength, indexHeight] == " ";
         }
+
+        private int GetAliveNeighbours(int length, int height)
+        { 
+            var neighbours = new string[8];
+
+            neighbours[0] = IsCellInitialized(length - 1, height - 1) ? _cellsOldGeneration[length - 1, height - 1] : " ";
+            neighbours[1] = IsCellInitialized(length - 1, height) ? _cellsOldGeneration[length - 1, height] : " ";
+            neighbours[2] = IsCellInitialized(length - 1, height + 1) ? _cellsOldGeneration[length - 1, height + 1] : " ";
+            neighbours[3] = IsCellInitialized(length, height - 1) ? _cellsOldGeneration[length, height - 1] : " ";
+            neighbours[4] = IsCellInitialized(length, height + 1) ? _cellsOldGeneration[length, height + 1] : " ";
+            neighbours[5] = IsCellInitialized(length + 1, height - 1) ? _cellsOldGeneration[length + 1, height - 1] : " ";
+            neighbours[6] = IsCellInitialized(length + 1, height) ? _cellsOldGeneration[length + 1, height] : " ";
+            neighbours[7] = IsCellInitialized(length + 1, height + 1) ? _cellsOldGeneration[length + 1, height + 1] : " ";
+
+            return neighbours.Count(neighbour => neighbour == "*");
+        }
+
+        private bool IsCellInitialized(int length, int height) =>
+            !(length >= LengthOfField || length < 0 || height >= HeightOfField|| height < 0);
     }
 }

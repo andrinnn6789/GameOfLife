@@ -49,10 +49,28 @@ namespace GameOfLife.Test
             _testee.Cells.Should().BeEquivalentTo(expectedGeneration);
         }
 
+        [Fact]
+        public void TestBlinker_ExpectLoop()
+        {
+            _testee = new Field(3, 3);
+
+            _testee.SwitchLiveState(1, 0);
+            _testee.SwitchLiveState(1, 1);
+            _testee.SwitchLiveState(1, 2);
+            _testee.GoToNextGeneration();
+
+            var expectedGeneration = CreateDeadGeneration();
+            expectedGeneration[0, 1] = "*";
+            expectedGeneration[1, 1] = "*";
+            expectedGeneration[2, 1] = "*";
+
+            _testee.Cells.Should().BeEquivalentTo(expectedGeneration);
+        }
+
         private string[,] CreateDeadGeneration()
         {
-            var deadGeneration = new string[_testee.LenghtOfField, _testee.HeightOfField];
-            for (int i = 0; i < _testee.LenghtOfField; i++)
+            var deadGeneration = new string[_testee.LengthOfField, _testee.HeightOfField];
+            for (int i = 0; i < _testee.LengthOfField; i++)
             {
                 for (int j = 0; j < _testee.HeightOfField; j++)
                 {
