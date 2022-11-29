@@ -14,9 +14,9 @@
             HeightOfField = heightOfField;
             Cells = new string[LengthOfField, HeightOfField];
 
-            for (int i = 0; i < LengthOfField; i++)
+            for (var i = 0; i < LengthOfField; i++)
             {
-                for (int j = 0; j < HeightOfField; j++)
+                for (var j = 0; j < HeightOfField; j++)
                 {
                     Cells[i, j] = " ";
                 }
