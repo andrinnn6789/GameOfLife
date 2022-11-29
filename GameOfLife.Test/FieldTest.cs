@@ -75,7 +75,7 @@ namespace GameOfLife.Test
             {
                 for (int j = 0; j < _testee.HeightOfField; j++)
                 {
-                    deadGeneration[i, j] = ".";
+                    deadGeneration[i, j] = " ";
                 }
             }
 
